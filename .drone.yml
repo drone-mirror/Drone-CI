@@ -1,0 +1,17 @@
+kind: pipeline
+name: HANA-CI-Bot
+
+steps:
+- name: Drone-Builder
+  image: ubuntu:rolling
+  environment:
+   token:
+     from_secret: token
+   chat_id:
+     from_secret: chat_id
+  commands:
+  - apt-get update -y &&  apt-get upgrade -y
+  - apt-get install -y bash wget
+  - wget https://raw.githubusercontent.com/Nicklas373/Semaphore-CI/semaphore-setup/drone-mido-clang.sh
+  - chmod a+x drone-mido-clang.sh
+  - bash drone-mido-clang.sh
