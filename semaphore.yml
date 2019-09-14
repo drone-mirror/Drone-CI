@@ -1,0 +1,19 @@
+# Find an example for your language and learn about the core features through
+# the guided tour:
+# https://docs.semaphoreci.com/category/58-programming-languages
+# https://docs.semaphoreci.com/category/56-guided-tour
+version: v1.0
+name: HANA Semaphore-CI
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Semaphore-CI
+    task:
+      jobs: 
+      - name: BOT-Builder
+        commands:
+          - wget https://raw.githubusercontent.com/Nicklas373/Semaphore-CI/semaphore-setup/semaphore-mido-clang.sh
+          - chmod a+x semaphore-mido-clang.sh
+          - bash semaphore-mido-clang.sh

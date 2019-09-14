@@ -147,6 +147,7 @@ function anykernel() {
         cd AnyKernel3
         make -j4
         mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+	cd ..
 }
 
 # Upload Kernel
