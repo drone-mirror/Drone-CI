@@ -19,7 +19,7 @@
 mkdir Clarity-TEMP
 
 # Installing Dependencies
-apt-get install -y ccache bc bash git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
+apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
 
 # Cloning Toolchains , AnyKernel & Kernel Repository
 git clone https://github.com/Nicklas373/aosp-clang -b r365631 clang
@@ -47,9 +47,8 @@ KERNEL=$(pwd)/mido
 KERNEL_TEMP=$(pwd)/Clarity-TEMP
 CODENAME="mido"
 BRANCH="mido"
-COMMIT="d281cab0ca070e217c0a649dcd6fa4ce348b274b"
 KERNEL_CODE="Mido"
-KERNEL_REV="r7"
+KERNEL_REV="r8"
 TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 KERNEL_NAME="Clarity"
 KERNEL_SUFFIX="Kernel"
