@@ -22,7 +22,7 @@ mkdir Clarity-TEMP
 apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
 
 # Cloning Toolchains , AnyKernel & Kernel Repository
-git clone https://github.com/Ancient-Project/clang-10 -b 10.0 clang
+git clone https://github.com/Ancient-Project/clang-10 -b 10.0.0 clang
 git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm gcc_arm32
 git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm64 gcc
 git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b dev/yukina mido
