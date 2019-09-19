@@ -2,7 +2,7 @@ kind: pipeline
 name: HANA-CI-Bot
 
 steps:
-- name: Drone-Builder
+- name: HANA-CI-Builder
   image: ubuntu:rolling
   environment:
    token:
