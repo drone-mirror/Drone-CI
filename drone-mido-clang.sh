@@ -39,12 +39,12 @@ export ARCH=arm64
 export SUBARCH=arm64
 export KBUILD_BUILD_USER=Yukina
 export KBUILD_BUILD_HOST=Drone-CI
-export CLANG_PATH=$(pwd)/mido/clang/bin
+export CLANG_PATH=$(pwd)/clang/bin
 export PATH=${CLANG_PATH}:${PATH}
 export CLANG_TRIPLE=aarch64-linux-gnu-
 export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
-export CROSS_COMPILE=$(pwd)/mido/gcc/bin/aarch64-linux-gnu-
-export CROSS_COMPILE_ARM32=$(pwd)/mido/gcc_arm32/bin/arm-linux-gnueabi-
+export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
+export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
 
 # Kernel aliases
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
