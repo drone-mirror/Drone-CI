@@ -49,7 +49,6 @@ export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
 # Kernel aliases
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 KERNEL=$(pwd)
-KERNEL_TEMP=${HOME}/Clarity-TEMP
 CODENAME="mido"
 BRANCH="mido"
 KERNEL_CODE="Mido"
@@ -150,14 +149,14 @@ function compile() {
 function anykernel() {
         cd AnyKernel3
         make -j4
-        mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
-	cd ..
+        mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ~/Clarity-TEMP/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+	cd mido
 }
 
 # Upload Kernel
 function kernel_upload(){
 	bot_complete_compile
-        $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+        $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f ~/Clarity-TEMP/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
 }
 
 # Running
