@@ -25,7 +25,7 @@ mkdir Clarity-TEMP
 apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
 
 # Cloning Kernel Repository
-git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b dev/yukina mido
+git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b dev/backup mido
 
 # Pretty workaround :p
 cd mido
