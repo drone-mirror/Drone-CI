@@ -21,11 +21,16 @@ mkdir Clarity-TEMP
 # Installing Dependencies
 apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
 
-# Cloning Toolchains , AnyKernel & Kernel Repository
-git clone https://github.com/Ancient-Project/clang-10 -b 10.0 clang
+# Cloning Kernel Repository
+git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b dev/yukina mido
+
+# Pretty workaround :p
+cd mido
+
+# Clong toolchains and other repository
+git clone https://github.com/Nicklas373/aosp-clang -b r365631b clang
 git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm gcc_arm32
 git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm64 gcc
-git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b dev/yukina mido
 git clone https://github.com/Nicklas373/AnyKernel3 -b mido
 git clone https://github.com/fabianonline/telegram.sh -b master telegram
 
@@ -34,12 +39,12 @@ export ARCH=arm64
 export SUBARCH=arm64
 export KBUILD_BUILD_USER=Yukina
 export KBUILD_BUILD_HOST=Drone-CI
-export CLANG_PATH=$(pwd)/clang/bin
+export CLANG_PATH=$(pwd)/mido/clang/bin
 export PATH=${CLANG_PATH}:${PATH}
 export CLANG_TRIPLE=aarch64-linux-gnu-
 export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
-export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
-export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
+export CROSS_COMPILE=$(pwd)/mido/gcc/bin/aarch64-linux-gnu-
+export CROSS_COMPILE_ARM32=$(pwd)/mido/gcc_arm32/bin/arm-linux-gnueabi-
 
 # Kernel aliases
 IMAGE=$(pwd)/mido/out/arch/arm64/boot/Image.gz-dtb
@@ -47,7 +52,6 @@ KERNEL=$(pwd)/mido
 KERNEL_TEMP=$(pwd)/Clarity-TEMP
 CODENAME="mido"
 BRANCH="mido"
-COMMIT="50a438b32b3a23cd52f63d84cd19a862172c2270"
 KERNEL_CODE="Mido"
 KERNEL_REV="r8"
 TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
@@ -55,7 +59,7 @@ KERNEL_NAME="Clarity"
 KERNEL_SUFFIX="Kernel"
 KERNEL_TYPE="EAS"
 KERNEL_STATS="signed"
-KERNEL_DATE="$(date +%Y%m%d-%H%M)"
+KERNEL_DATE="$(TZ=Asia/Jakarta date +'%Y%m%d-%H%M')"
 TELEGRAM_BOT_ID="$token"
 TELEGRAM_GROUP_ID="$chat_id"
 TELEGRAM_FILENAME="${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip"
@@ -71,7 +75,7 @@ TELEGRAM_TOOLCHAIN_VER=$(cat ${KERNEL}/out/include/generated/compile.h | grep LI
 
 # Telegram Bot Service || Compiling Notification
 function bot_template() {
-telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -H \
+($pwd)/mido/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -H \
          "$(
             for POST in "${@}"; do
                 echo "${POST}"
@@ -129,8 +133,8 @@ bot_template "<b>|| Drone-CI Build Bot ||</b>" \
 # Compile Begin
 function compile() {
 	bot_first_compile
-	make -s -C ${KERNEL} mido_defconfig
-	make -s -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
+	make -C ${KERNEL} mido_defconfig
+	make -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
 	if ! [ -a $IMAGE ]; then
                 echo "kernel not found"
 		bot_build_failed
@@ -153,7 +157,7 @@ function anykernel() {
 # Upload Kernel
 function kernel_upload(){
 	bot_complete_compile
-        telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+        ($pwd)telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
 }
 
 # Running
