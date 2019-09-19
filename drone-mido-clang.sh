@@ -15,6 +15,9 @@
 # GNU General Public License for more details.
 #
 
+# Only for debugging :p
+ls
+
 # Necessary :p
 mkdir Clarity-TEMP
 
@@ -132,8 +135,8 @@ bot_template "<b>|| Drone-CI Build Bot ||</b>" \
 # Compile Begin
 function compile() {
 	bot_first_compile
-	make -C ${KERNEL} mido_defconfig
-	make -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
+	make -s -C ${KERNEL} mido_defconfig
+	make -s -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
 	if ! [ -a $IMAGE ]; then
                 echo "kernel not found"
 		bot_build_failed
@@ -149,14 +152,15 @@ function compile() {
 function anykernel() {
         cd AnyKernel3
         make -j4
-        mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ~/Clarity-TEMP/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+        mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+	cd ..
 	cd mido
 }
 
 # Upload Kernel
 function kernel_upload(){
 	bot_complete_compile
-        $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f ~/Clarity-TEMP/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+        $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f $(pwd)/AnyKernel3/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
 }
 
 # Running
