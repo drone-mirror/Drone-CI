@@ -49,7 +49,7 @@ export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
 # Kernel aliases
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 KERNEL=$(pwd)
-KERNEL_TEMP=$(pwd)/Clarity-TEMP
+KERNEL_TEMP=${HOME}/Clarity-TEMP
 CODENAME="mido"
 BRANCH="mido"
 KERNEL_CODE="Mido"
