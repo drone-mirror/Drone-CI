@@ -25,7 +25,7 @@ mkdir Clarity-TEMP
 apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
 
 # Cloning Kernel Repository
-git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b dev/backup mido
+git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b staging/yukina/r8 mido
 
 # Pretty workaround :p
 cd mido
@@ -50,6 +50,7 @@ export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
 export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
 
 # Kernel aliases
+COMMIT="675a82520614507b3d24a13ea0b5a96089249488"
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 KERNEL=$(pwd)
 CODENAME="mido"
@@ -122,7 +123,9 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
 function bot_build_success() {
 bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
-              "<b>Clarity Kernel build Success!</b>"
+              "<b>Clarity Kernel build Success!</b>" \
+	      "" \
+	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)"
 }
 
 # Telegram bot message || failed notification
@@ -130,11 +133,14 @@ function bot_build_failed() {
 bot_template "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
               "<b>Clarity Kernel build Failed!</b>"
+	      "" \
+	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)"
 }
 
 # Compile Begin
 function compile() {
 	bot_first_compile
+	START=$(date +"%s")
 	make -s -C ${KERNEL} mido_defconfig
 	make -s -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
 	if ! [ -a $IMAGE ]; then
@@ -142,6 +148,8 @@ function compile() {
 		bot_build_failed
                 exit 1
         fi
+	END=$(date +"%s")
+	DIFF=$(($END - $START))
 	bot_build_success
         cp ${IMAGE} AnyKernel3/Image.gz-dtb
 	anykernel
@@ -161,6 +169,8 @@ function anykernel() {
 function kernel_upload(){
 	bot_complete_compile
         $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f $(pwd)/AnyKernel3/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
+	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git-changelog.txt
+	$(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f git-changelog.txt
 }
 
 # Running
