@@ -15,10 +15,7 @@
 # GNU General Public License for more details.
 #
 
-# Only for debugging :p
-ls
-
-# Necessary :p
+# First start
 mkdir Clarity-TEMP
 
 # Installing Dependencies
@@ -27,7 +24,7 @@ apt-get install -y ccache bc git-core gnupg build-essential zip curl make automa
 # Cloning Kernel Repository
 git clone https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18 -b staging/yukina/r8 mido
 
-# Pretty workaround :p
+# Workaround For Directory
 cd mido
 
 # Clong toolchains and other repository
@@ -116,16 +113,16 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
     "" \
     "<b>UTS Version :</b><code> ${TELEGRAM_UTS_VER}</code>" \
     "" \
-    "<b>Latest commit :</b><code> $(git --no-pager log --pretty=format:'"%h - %s (%an)"' -1)</code>"
+    "<b>Latest commit :</b><code> $(git --no-pager log --pretty=format:'"%h - %s (%an)"' -1)</code>" \
+    "" \
+    "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)</code>"
 }
 
 # Telegram bot message || success notification
 function bot_build_success() {
 bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
-              "<b>Clarity Kernel build Success!</b>" \
-	      "" \
-	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)</code>"
+              "<b>Clarity Kernel build Success!</b>"
 }
 
 # Telegram bot message || failed notification
@@ -162,7 +159,6 @@ function anykernel() {
         make -j4
         mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
 	cd ..
-	cd mido
 }
 
 # Upload Kernel
