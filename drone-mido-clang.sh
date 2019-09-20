@@ -125,7 +125,7 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
               "<b>Clarity Kernel build Success!</b>" \
 	      "" \
-	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)"
+	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)</code>"
 }
 
 # Telegram bot message || failed notification
@@ -134,7 +134,7 @@ bot_template "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
               "<b>Clarity Kernel build Failed!</b>"
 	      "" \
-	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)"
+	      "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)</code>"
 }
 
 # Compile Begin
@@ -169,8 +169,8 @@ function anykernel() {
 function kernel_upload(){
 	bot_complete_compile
         $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f $(pwd)/AnyKernel3/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
-	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git-changelog.txt
-	$(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f git-changelog.txt
+	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git-changelog.log
+	$(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f git-changelog.log
 }
 
 # Running
