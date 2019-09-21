@@ -12,6 +12,6 @@ steps:
   commands:
   - apt-get update -y &&  apt-get upgrade -y
   - apt-get install -y bash wget
-  - wget https://raw.githubusercontent.com/Nicklas373/Drone-CI/drone/drone-mido-clang.sh
-  - chmod a+x drone-mido-clang.sh
-  - bash drone-mido-clang.sh
+  - wget https://raw.githubusercontent.com/Nicklas373/Drone-CI/drone/drone-lavender-clang.sh
+  - chmod a+x drone-lavender-clang.sh
+  - bash drone-lavender-clang.sh
