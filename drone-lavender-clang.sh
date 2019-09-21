@@ -19,7 +19,7 @@
 mkdir Clarity-TEMP
 
 # Installing Dependencies
-apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash
+apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
 
 # Cloning Kernel Repository
 git clone https://github.com/Nicklas373/kernel_xiaomi_lavender -b dev/staging/no-pelt lavender
