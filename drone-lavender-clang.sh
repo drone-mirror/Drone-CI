@@ -22,7 +22,7 @@ mkdir Clarity-TEMP
 apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
 
 # Cloning Kernel Repository
-git clone https://github.com/Nicklas373/kernel_xiaomi_lavender -b dev/staging/yukina lavender
+git clone https://github.com/Nicklas373/kernel_xiaomi_lavender -b dev/10/yukina lavender
 
 # Workaround For Directory
 cd lavender
