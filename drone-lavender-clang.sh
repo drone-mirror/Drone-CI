@@ -22,7 +22,7 @@ mkdir Clarity-TEMP
 apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
 
 # Cloning Kernel Repository
-git clone https://github.com/Nicklas373/kernel_xiaomi_lavender -b dev/10/yukina lavender
+git clone https://github.com/Nicklas373/kernel_xiaomi_lavender -b staging/no-pelt lavender
 
 # Workaround For Directory
 cd lavender
@@ -47,7 +47,7 @@ export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
 export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
 
 # Kernel aliases
-COMMIT="8a85b0388230d2bffc1472577f06ad6d0390f58d"
+# COMMIT="8a85b0388230d2bffc1472577f06ad6d0390f58d"
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 KERNEL=$(pwd)
 CODENAME="lavender"
@@ -165,8 +165,8 @@ function anykernel() {
 function kernel_upload(){
 	bot_complete_compile
         $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f $(pwd)/AnyKernel3/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_STATS}-${KERNEL_DATE}.zip
-	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git-changelog.log
-	$(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f git-changelog.log
+	# git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git-changelog.log
+	# $(pwd)/telegram/telegram -t ${TELEGRAM_BOT_ID} -c ${TELEGRAM_GROUP_ID} -f git-changelog.log
 }
 
 # Running
