@@ -36,21 +36,12 @@
 # Kernel Extend Defconfig
 # 0 = Dev-Mido || 1 = Dev-Lave || 2 = Null
 #
-# Kernel CI Provider
-# 0 = Circle-CI || 1 = Drone-CI
 KERNEL_NAME_RELEASE="3"
 KERNEL_TYPE="1"
 KERNEL_BRANCH_RELEASE="0"
 KERNEL_ANDROID_VERSION="2"
 KERNEL_CODENAME="1"
 KERNEL_EXTEND="1"
-KERNEL_PROV="1"
-
-if ["$KERNEL_PROV" == "1" ];
-	then
-		# Installing Dependencies
-		apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
-fi
 
 # Compiling For Mido // If mido was selected
 if [ "$KERNEL_CODENAME" == "0" ];
@@ -81,14 +72,12 @@ if [ "$KERNEL_CODENAME" == "0" ];
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		if [ "$KERNEL_PROV" == "1" ];
-			then
-				# Cloning Kernel Repository
-				git clone --depth=1 -b toyama  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
+		# Cloning Kernel Repository
+		git clone --depth=1 -b toyama  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
 
-				# Cloning Clang Repository
-				git clone https://github.com/NusantaraDevs/clang --depth=1 -b dev/10.0 clang
-		fi
+		# Cloning Clang Repository
+		git clone https://github.com/NusantaraDevs/clang --depth=1 -b dev/10.0 clang
+
 		# Cloning AnyKernel Repository
 		git clone https://github.com/Nicklas373/AnyKernel3 -b lavender
 
@@ -98,43 +87,21 @@ fi
 
 # Kernel Enviroment
 export ARCH=arm64
-if [ "$KERNEL_CODENAME" == "0" ];
-	then
-		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
-elif [ "$KERNEL_CODENAME" == "1" ];
-	then
-		if [ "$KERNEL_PROV" == "0" ];
-			then
-				export LD_LIBRARY_PATH="/root/clang/bin/../lib:$PATH"
-		elif [ "$KERNEL_PROV" == "1" ];
-			then
-				export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
-		fi
-fi
+export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
 export KBUILD_BUILD_USER=Yukina
-export KBUILD_BUILD_HOST=Circle-CI
+export KBUILD_BUILD_HOST=Drone-CI
 
 # Kernel aliases
+IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz-dtb"
+KERNEL="$(pwd)/kernel"
+KERNEL_TEMP="$(pwd)/TEMP"
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
-		IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz-dtb"
-		KERNEL="$(pwd)/kernel"
-		KERNEL_TEMP="$(pwd)/TEMP"
 		CODENAME="mido"
 		KERNEL_CODE="Mido"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		if [ "$KERNEL_PROV" == "0" ];
-			then
-				IMAGE="$(pwd)/out/arch/arm64/boot/Image.gz-dtb"
-				KERNEL="$(pwd)"
-		elif [ "$KERNEL_PROV" == "1" ];
-			then
-				IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz-dtb"
-				KERNEL="$(pwd)/kernel"
-		fi
-		KERNEL_TEMP="$(pwd)/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
@@ -219,7 +186,7 @@ curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendMessage -d ch
 
 # Telegram bot message || first notification
 function bot_first_compile() {
-bot_template  "<b>|| HANA-CI Build Bot ||</b>" \
+bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
 	      "<b>${KERNEL_NAME} Kernel build Start!</b>" \
 	      "" \
@@ -235,7 +202,7 @@ bot_template  "<b>|| HANA-CI Build Bot ||</b>" \
 # Telegram bot message || complete compile notification
 function bot_complete_compile() {
 bot_env
-bot_template  "<b>|| HANA-CI Build Bot ||</b>" \
+bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
     "" \
     "<b>New ${KERNEL_NAME} Kernel Build Is Available!</b>" \
     "" \
@@ -264,14 +231,14 @@ bot_template  "<b>|| HANA-CI Build Bot ||</b>" \
 
 # Telegram bot message || success notification
 function bot_build_success() {
-bot_template  "<b>|| HANA-CI Build Bot ||</b>" \
+bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
 	      "<b>${KERNEL_NAME} Kernel build Success!</b>"
 }
 
 # Telegram bot message || failed notification
 function bot_build_failed() {
-bot_template "<b>|| HANA-CI Build Bot ||</b>" \
+bot_template "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
 	      "<b>${KERNEL_NAME} Kernel build Failed!</b>" \
               "" \
@@ -331,13 +298,7 @@ function compile() {
 			fi
         		START=$(date +"%s")
         		make -s lavender_defconfig O=out
-			if [ "$KERNEL_PROV" == "0" ];
-				then
-        				PATH="/root/clang/bin:${PATH}" \
-			elif [ "$KERNEL_PROV" == "1" ];
-				then
-					PATH="$(pwd)/clang/bin:${PATH" \
-			fi
+			PATH="$(pwd)/clang/bin:${PATH" \
         		make -s -j$(nproc --all) O=out \
                         				CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -382,4 +343,3 @@ function kernel_upload(){
 
 # Running
 compile
-
