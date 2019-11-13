@@ -11,7 +11,7 @@ steps:
      from_secret: chat_id
   commands:
   - apt-get update -y &&  apt-get upgrade -y
-  - apt-get install -y bash wget ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
+  - apt-get install -y bison flex bash wget ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
   - wget https://raw.githubusercontent.com/drone-mirror/Drone-CI/drone/drone-unified.sh
   - chmod a+x drone-unified.sh
   - bash drone-unified.sh

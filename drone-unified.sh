@@ -257,10 +257,10 @@ function compile() {
 	cd ..
 	if [ "$KERNEL_EXTEND" == "0" ];
 		then
-			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r13-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r14-LA.UM.8.6.r1-02300-89xx.0"' arch/arm64/configs/mido_defconfig
+			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r13-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r14-LA.UM.8.6.r1-02300-89xx.0"' $(pwd)/kernel/arch/arm64/configs/mido_defconfig
 	elif [ "$KERNEL_EXTEND" == "1" ];
 		then
-			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r10-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r11-LA.UM.8.6.r1-02300-89xx.0"' arch/arm64/configs/lavender_defconfig
+			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r10-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r11-LA.UM.8.6.r1-02300-89xx.0"' $(pwd)/kernel/arch/arm64/configs/lavender_defconfig
 	fi
 	START=$(date +"%s")
 	make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
