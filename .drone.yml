@@ -4,6 +4,11 @@ name: HANA-CI-Bot
 steps:
 - name: HANA-CI-Builder
   image: ubuntu:rolling
+  environment:
+   token:
+     from_secret: token
+   chat_id:
+     from_secret: chat_id
   commands:
   - apt-get update -y &&  apt-get upgrade -y
   - apt-get install -y bash wget
