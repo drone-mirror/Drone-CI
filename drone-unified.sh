@@ -36,12 +36,12 @@
 # Kernel Extend Defconfig
 # 0 = Dev-Mido || 1 = Dev-Lave || 2 = Null
 #
-KERNEL_NAME_RELEASE="3"
+KERNEL_NAME_RELEASE="1"
 KERNEL_TYPE="1"
 KERNEL_BRANCH_RELEASE="0"
-KERNEL_ANDROID_VERSION="2"
-KERNEL_CODENAME="1"
-KERNEL_EXTEND="1"
+KERNEL_ANDROID_VERSION="0"
+KERNEL_CODENAME="0"
+KERNEL_EXTEND="0"
 
 # Compiling For Mido // If mido was selected
 if [ "$KERNEL_CODENAME" == "0" ];
@@ -258,10 +258,10 @@ function compile() {
 	cd ..
 	if [ "$KERNEL_EXTEND" == "0" ];
 		then
-			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r13-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r14-LA.UM.8.6.r1-02300-89xx.0"' $(pwd)/kernel/arch/arm64/configs/mido_defconfig
+			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r13-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r14-LA.UM.8.6.r1-02300-89xx.0"' ${KERNEL}/arch/arm64/configs/mido_defconfig
 	elif [ "$KERNEL_EXTEND" == "1" ];
 		then
-			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r10-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r11-LA.UM.8.6.r1-02300-89xx.0"' $(pwd)/kernel/arch/arm64/configs/lavender_defconfig
+			sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r10-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r11-LA.UM.8.6.r1-02300-89xx.0"' ${KERNEL}/arch/arm64/configs/lavender_defconfig
 	fi
 	START=$(date +"%s")
 	make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
