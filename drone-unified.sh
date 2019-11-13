@@ -46,6 +46,12 @@ KERNEL_CODENAME="1"
 KERNEL_EXTEND="1"
 KERNEL_PROV="1"
 
+if ["$KERNEL_PROV" == "1" ];
+	then
+		# Installing Dependencies
+		apt-get install -y ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
+fi
+
 # Compiling For Mido // If mido was selected
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
