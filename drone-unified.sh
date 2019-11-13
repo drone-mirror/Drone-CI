@@ -260,6 +260,9 @@ function compile() {
 			if [ "$KERNEL_EXTEND" == "0" ];
 				then
 					sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r13-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r14-LA.UM.8.6.r1-02300-89xx.0"' arch/arm64/configs/mido_defconfig
+			elif [ "$KERNEL_EXTEND" == "1" ];
+				then
+					sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r10-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r11-LA.UM.8.6.r1-02300-89xx.0"' arch/arm64/configs/lavender_defconfig
 			fi
 			START=$(date +"%s")
 			make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
@@ -289,38 +292,6 @@ function compile() {
         		cp ${IMAGE} AnyKernel3/Image.gz-dtb
 			anykernel
 			kernel_upload
-	elif [ "$KERNEL_CODENAME" == "1" ];
-		then
-			bot_first_compile
-			if [ "$KERNEL_EXTEND" == "1" ];
-				then
-					sed -i '/CONFIG_LOCALVERSION="-友希那-Kernel-r10-LA.UM.8.6.r1-02300-89xx.0"/c\ CONFIG_LOCALVERSION="-戸山-Kernel-r11-LA.UM.8.6.r1-02300-89xx.0"' arch/arm64/configs/lavender_defconfig
-			fi
-        		START=$(date +"%s")
-        		make -s lavender_defconfig O=out
-			PATH="$(pwd)/clang/bin:${PATH" \
-        		make -s -j$(nproc --all) O=out \
-                        				CC=clang \
-							CLANG_TRIPLE=aarch64-linux-gnu- \
-		        				CROSS_COMPILE=aarch64-linux-gnu- \
-							CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-			if ! [ -a $IMAGE ];
-				then
-                			echo "kernel not found"
-                			END=$(date +"%s")
-                			DIFF=$(($END - $START))
-                			bot_build_failed
-					sendStick "${TELEGRAM_FAIL}"
-               				exit 1
-        		fi
-       			END=$(date +"%s")
-        		DIFF=$(($END - $START))
-			bot_build_success
-			sendStick "${TELEGRAM_SUCCESS}"
-        		cp ${IMAGE} AnyKernel3/Image.gz-dtb
-			anykernel
-			kernel_upload
-	fi
 }
 
 # AnyKernel
