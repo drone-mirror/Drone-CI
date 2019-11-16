@@ -36,10 +36,10 @@
 # Kernel Extend Defconfig
 # 0 = Dev-Mido || 1 = Dev-Lave || 2 = Null
 #
-KERNEL_NAME_RELEASE="1"
+KERNEL_NAME_RELEASE="2"
 KERNEL_TYPE="1"
 KERNEL_BRANCH_RELEASE="1"
-KERNEL_ANDROID_VERSION="0"
+KERNEL_ANDROID_VERSION="1"
 KERNEL_CODENAME="0"
 KERNEL_EXTEND="2"
 
@@ -62,7 +62,7 @@ if [ "$KERNEL_CODENAME" == "0" ];
 		elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 			then
 				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b dev/yukina-10 https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+				git clone --depth=1 -b dev/toyama-10 https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b yukina/10
 		fi
 
