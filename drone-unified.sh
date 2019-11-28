@@ -120,9 +120,9 @@ if [ "$KERNEL_CODENAME" == "0" ];
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		IMAGE="$(pwd)/out/arch/arm64/boot/Image.gz"
-		DTB="$(pwd)/out/arch/arm64/boot/dts/qcom"
-		KERNEL="$(pwd)"
+		IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz"
+		DTB="$(pwd)/kernel/out/arch/arm64/boot/dts/qcom"
+		KERNEL="$(pwd)/kernel"
 		KERNEL_TEMP="$(pwd)/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
