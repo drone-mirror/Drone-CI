@@ -1,6 +1,7 @@
 #!bin/bash
 #
 # Copyright 2019, Najahiiii <najahiii@outlook.co.id>
+# Copyright 2019, alanndz <alanmahmud0@gmail.com>
 # Copyright 2019, Dicky Herlambang "Nicklas373" <herlambangdicky5@gmail.com>
 # Copyright 2016-2019, HANA-CI Build Project
 #
@@ -36,12 +37,16 @@
 # Kernel Extend Defconfig
 # 0 = Dev-Mido || 1 = Dev-Lave || 2 = Null
 #
-KERNEL_NAME_RELEASE="2"
-KERNEL_TYPE="1"
+# Kernel Compiler
+# 0 = Clang 10.0.0 || 1 = Clang 10.0.1 + (GCC 9.2.0 32/64)
+#
+KERNEL_NAME_RELEASE="0"
+KERNEL_TYPE="0"
 KERNEL_BRANCH_RELEASE="1"
-KERNEL_ANDROID_VERSION="1"
+KERNEL_ANDROID_VERSION="2"
 KERNEL_CODENAME="0"
 KERNEL_EXTEND="2"
+KERNEL_COMPILER="0"
 
 # Compiling For Mido // If mido was selected
 if [ "$KERNEL_CODENAME" == "0" ];
@@ -52,56 +57,70 @@ if [ "$KERNEL_CODENAME" == "0" ];
 		if [ "$KERNEL_NAME_RELEASE" == "0" ];
 			then
 				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b pie https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+				git clone --depth=1 -b dev/pie https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b caf/mido
 		elif [ "$KERNEL_NAME_RELEASE" == "1" ];
 			then
 				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b dev/toyama https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+				git clone --depth=1 -b dev/kasumi https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
 		elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 			then
 				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b dev/toyama-10 https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+				git clone --depth=1 -b dev/kasumi-10 https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b yukina/10
 		fi
-
-		# Cloning Toolchains Repository
-		git clone https://github.com/Nicklas373/clang --depth=1 -b test clang
-
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		# Cloning Kernel Repository
-		git clone --depth=1 -b toyama  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
-
-		# Cloning Clang Repository
-		git clone https://github.com/NusantaraDevs/clang --depth=1 -b dev/10.0 clang
-
 		# Cloning AnyKernel Repository
 		git clone https://github.com/Nicklas373/AnyKernel3 -b lavender
 
 		# Create Temporary Folder
 		mkdir TEMP
 fi
-
+if [ "$KERNEL_COMPILER" == "0" ];
+	then
+		# Cloning Toolchains Repository
+		git clone https://github.com/NusantaraDevs/clang --depth=1 -b dev/10.0 clang
+elif [ "$KERNEL_COMPILER" == "1" ];
+	then
+		# Cloning Toolchains Repository
+		git clone https://github.com/Nicklas373/aosp-clang -b r370808 clang
+		git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm gcc_arm32
+		git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm64 gcc
+fi
 # Kernel Enviroment
 export ARCH=arm64
-export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
-export KBUILD_BUILD_USER=Yukina
+if [ "$KERNEL_COMPILER" == "0" ];
+	then
+		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
+elif [ "$KERNEL_COMPILER" == "1" ];
+	then
+		export CLANG_PATH=$(pwd)/clang/bin
+		export PATH=${CLANG_PATH}:${PATH}
+		export CLANG_TRIPLE=aarch64-linux-gnu-
+		export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
+		export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
+		export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
+fi
+export KBUILD_BUILD_USER=Kasumi
 export KBUILD_BUILD_HOST=Drone-CI
-
 # Kernel aliases
-IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz-dtb"
-KERNEL="$(pwd)/kernel"
-KERNEL_TEMP="$(pwd)/TEMP"
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
+		IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz-dtb"
+		KERNEL="$(pwd)/kernel"
+		KERNEL_TEMP="$(pwd)/TEMP"
 		CODENAME="mido"
 		KERNEL_CODE="Mido"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
+		IMAGE="$(pwd)/out/arch/arm64/boot/Image.gz"
+		DTB="$(pwd)/out/arch/arm64/boot/dts/qcom"
+		KERNEL="$(pwd)"
+		KERNEL_TEMP="$(pwd)/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
@@ -115,19 +134,19 @@ if [ "$KERNEL_NAME_RELEASE" == "0" ];
 elif [ "$KERNEL_NAME_RELEASE" == "1" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r13"
+		KERNEL_REV="r14"
 		KERNEL_NAME="Clarity"
 		KERNEL_TYPE="EAS"
 elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r13"
+		KERNEL_REV="r14"
 		KERNEL_NAME="Clarity"
  		KERNEL_TYPE="EAS"
 elif [ "$KERNEL_NAME_RELEASE" == "3" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r10"
+		KERNEL_REV="r11"
 		KERNEL_NAME="Clarity"
 		KERNEL_TYPE="EAS"
 fi
@@ -253,44 +272,82 @@ function sendStick() {
 
 # Compile Begin
 function compile() {
-	cd ${KERNEL}
-	bot_first_compile
-	cd ..
-	if [ "$KERNEL_EXTEND" == "0" ];
+	if [ "$KERNEL_CODENAME" == "0" ];
 		then
-			sed -i -e 's/-友希那-Kernel-r13-LA.UM.8.6.r1-02300-89xx.0/-戸山-Kernel-r14-LA.UM.8.6.r1-02300-89xx.0/g'  ${KERNEL}/arch/arm64/configs/mido_defconfig
-	elif [ "$KERNEL_EXTEND" == "1" ];
-		then
-			sed -i -e 's/-友希那-Kernel-r10-LA.UM.8.2.r1-04800-sdm660.0/-戸山-Kernel-r11-LA.UM.8.2.r1-04800-sdm660.0/g'  ${KERNEL}/arch/arm64/configs/lavender_defconfig
-	fi
-	START=$(date +"%s")
-	make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
-	PATH="$(pwd)/clang/bin/:${PATH}" \
-      	make -s -C ${KERNEL} -j$(nproc --all) O=out \
-						CC=clang \
-						CLANG_TRIPLE=aarch64-linux-gnu- \
-        					CROSS_COMPILE=aarch64-linux-gnu- \
-						CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-	if ! [ -a $IMAGE ];
-		then
-             		echo "kernel not found"
-                	END=$(date +"%s")
-                	DIFF=$(($END - $START))
 			cd ${KERNEL}
-                	bot_build_failed
+			bot_first_compile
 			cd ..
-			sendStick "${TELEGRAM_FAIL}"
-                	exit 1
-        	fi
-        END=$(date +"%s")
-        DIFF=$(($END - $START))
-	cd ${KERNEL}
-	bot_build_success
-	cd ..
-	sendStick "${TELEGRAM_SUCCESS}"
-        cp ${IMAGE} AnyKernel3/Image.gz-dtb
-	anykernel
-	kernel_upload
+			if [ "$KERNEL_EXTEND" == "0" ];
+				then
+					sed -i -e 's/-友希那-Kernel-r14-LA.UM.8.6.r1-02600-89xx.0/-戸山-Kernel-r14-LA.UM.8.6.r1-02600-89xx.0/g'  ${KERNEL}/arch/arm64/configs/mido_defconfig
+			fi
+			START=$(date +"%s")
+			make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
+		if [ "$KERNEL_COMPILER" == "0" ];
+			then
+				PATH="$(pwd)/clang/bin/:${PATH}" \
+        			make -s -C ${KERNEL} -j$(nproc --all) O=out \
+								CC=clang \
+								CLANG_TRIPLE=aarch64-linux-gnu- \
+		        					CROSS_COMPILE=aarch64-linux-gnu- \
+								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+		elif [ "$KERNEL_COMPILER" == "1" ];
+			then
+				make -s -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
+		fi
+			if ! [ -a $IMAGE ];
+				then
+                			echo "kernel not found"
+                			END=$(date +"%s")
+                			DIFF=$(($END - $START))
+					cd ${KERNEL}
+                			bot_build_failed
+					cd ..
+					sendStick "${TELEGRAM_FAIL}"
+                			exit 1
+        		fi
+        		END=$(date +"%s")
+        		DIFF=$(($END - $START))
+			cd ${KERNEL}
+			bot_build_success
+			cd ..
+			sendStick "${TELEGRAM_SUCCESS}"
+        		cp ${IMAGE} AnyKernel3/Image.gz-dtb
+			anykernel
+			kernel_upload
+	elif [ "$KERNEL_CODENAME" == "1" ];
+		then
+			bot_first_compile
+			if [ "$KERNEL_EXTEND" == "1" ];
+				then
+					sed -i -e 's/-友希那-Kernel-r10-LA.UM.8.2.r1-04800-sdm660.0/-戸山-Kernel-r11-LA.UM.8.2.r1-04800-sdm660.0/g'  ${KERNEL}/arch/arm64/configs/lavender_defconfig
+			fi
+        		START=$(date +"%s")
+        		make -s lavender_defconfig O=out
+        		PATH="$(pwd)/clang/bin:${PATH}" \
+        		make -s -j$(nproc --all) O=out \
+                        				CC=clang \
+							CLANG_TRIPLE=aarch64-linux-gnu- \
+		        				CROSS_COMPILE=aarch64-linux-gnu- \
+							CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+			if ! [ -a $IMAGE ];
+				then
+                			echo "kernel not found"
+                			END=$(date +"%s")
+                			DIFF=$(($END - $START))
+                			bot_build_failed
+					sendStick "${TELEGRAM_FAIL}"
+               				exit 1
+        		fi
+       			END=$(date +"%s")
+        		DIFF=$(($END - $START))
+			bot_build_success
+			sendStick "${TELEGRAM_SUCCESS}"
+        		cp ${IMAGE} AnyKernel3/kernel
+			cp ${DTB}/*.dtb AnyKernel3/dtbs
+			anykernel
+			kernel_upload
+	fi
 }
 
 # AnyKernel
