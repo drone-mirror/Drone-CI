@@ -57,7 +57,7 @@ if [ "$KERNEL_CODENAME" == "0" ];
 		if [ "$KERNEL_NAME_RELEASE" == "0" ];
 			then
 				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b dev/pie https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+				git clone --depth=1 -b pie https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b caf/mido
 		elif [ "$KERNEL_NAME_RELEASE" == "1" ];
 			then
@@ -128,7 +128,7 @@ fi
 if [ "$KERNEL_NAME_RELEASE" == "0" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r7"
+		KERNEL_REV="r8"
 		KERNEL_NAME="CAF"
 		KERNEL_TYPE="HMP"
 elif [ "$KERNEL_NAME_RELEASE" == "1" ];
