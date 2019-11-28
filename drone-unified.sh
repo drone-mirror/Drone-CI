@@ -40,11 +40,11 @@
 # Kernel Compiler
 # 0 = Clang 10.0.0 || 1 = Clang 10.0.1 + (GCC 9.2.0 32/64)
 #
-KERNEL_NAME_RELEASE="2"
+KERNEL_NAME_RELEASE="3"
 KERNEL_TYPE="1"
 KERNEL_BRANCH_RELEASE="1"
-KERNEL_ANDROID_VERSION="1"
-KERNEL_CODENAME="0"
+KERNEL_ANDROID_VERSION="2"
+KERNEL_CODENAME="1"
 KERNEL_EXTEND="2"
 KERNEL_COMPILER="0"
 
@@ -73,6 +73,9 @@ if [ "$KERNEL_CODENAME" == "0" ];
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
+		# Cloning Kernel Repository
+		git clone --depth=1 -b toyama  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
+
 		# Cloning AnyKernel Repository
 		git clone https://github.com/Nicklas373/AnyKernel3 -b lavender
 
