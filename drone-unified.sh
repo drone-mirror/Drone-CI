@@ -20,7 +20,7 @@
 # Let's make some option here
 #
 # Kernel Name Release
-# 0 = CAF || 1 = Clarity || 2 = Clarity-10 || 3 = Clarity-Lave
+# 0 = CAF || 1 = Clarity || 2 = Clarity-10 || 3 = Clarity-Lave || 4 = Clarity-UC-Mido
 #
 # Kernel Type
 # 0 = HMP || 1 = EAS
@@ -40,11 +40,11 @@
 # Kernel Compiler
 # 0 = Clang 10.0.0 || 1 = Clang 10.0.1 + (GCC 9.2.0 32/64)
 #
-KERNEL_NAME_RELEASE="3"
-KERNEL_TYPE="1"
+KERNEL_NAME_RELEASE="0"
+KERNEL_TYPE="0"
 KERNEL_BRANCH_RELEASE="1"
 KERNEL_ANDROID_VERSION="2"
-KERNEL_CODENAME="1"
+KERNEL_CODENAME="0"
 KERNEL_EXTEND="2"
 KERNEL_COMPILER="0"
 
@@ -59,16 +59,34 @@ if [ "$KERNEL_CODENAME" == "0" ];
 				# Clone kernel & other repositories earlier
 				git clone --depth=1 -b pie https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b caf/mido
+
+				# Define Kernel Scheduler
+				KERNEL_SCHED="HMP"
+
 		elif [ "$KERNEL_NAME_RELEASE" == "1" ];
 			then
 				# Clone kernel & other repositories earlier
 				git clone --depth=1 -b dev/kasumi https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
+
+				# Define Kernel Scheduler
+				KERNEL_SCHED="EAS"
 		elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 			then
 				# Clone kernel & other repositories earlier
 				git clone --depth=1 -b dev/kasumi-10 https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
 				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b yukina/10
+
+				# Define Kernel Scheduler
+				KERNEL_SCHED="EAS"
+		elif [ "$KERNEL_NAME_RELEASE" == "4" ];
+			then
+				# Clone kernel & other repositories earlier
+                                git clone --depth=1 -b dev/kasumi-uc https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+                                git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
+
+				# Define Kernel Scheduler
+				KERNEL_SCHED="EAS-UC"
 		fi
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
@@ -131,19 +149,19 @@ fi
 if [ "$KERNEL_NAME_RELEASE" == "0" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r8"
+		KERNEL_REV="r9"
 		KERNEL_NAME="CAF"
 		KERNEL_TYPE="HMP"
 elif [ "$KERNEL_NAME_RELEASE" == "1" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r14"
+		KERNEL_REV="r15"
 		KERNEL_NAME="Clarity"
 		KERNEL_TYPE="EAS"
 elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r14"
+		KERNEL_REV="r15"
 		KERNEL_NAME="Clarity"
  		KERNEL_TYPE="EAS"
 elif [ "$KERNEL_NAME_RELEASE" == "3" ];
@@ -217,6 +235,8 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
               "" \
               "<b>Device :</b><code> ${TELEGRAM_DEVICE} </code>" \
               "" \
+              "<b>Kernel Scheduler :</b><code> ${KERNEL_SCHED} </code>" \
+	      "" \
 	      "<b>Android Version :</b><code> ${KERNEL_ANDROID_VER} </code>" \
 	      "" \
               "<b>Latest commit :</b><code> $(git --no-pager log --pretty=format:'"%h - %s (%an)"' -1) </code>"
@@ -232,6 +252,8 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
     "<b>Build Status :</b><code> ${KERNEL_RELEASE} </code>" \
     "" \
     "<b>Device :</b><code> ${TELEGRAM_DEVICE} </code>" \
+    "" \
+    "<b>Kernel Scheduler :</b><code> ${KERNEL_SCHED} </code>" \
     "" \
     "<b>Android Version :</b><code> ${KERNEL_ANDROID_VER} </code>" \
     "" \
@@ -282,7 +304,7 @@ function compile() {
 			cd ..
 			if [ "$KERNEL_EXTEND" == "0" ];
 				then
-					sed -i -e 's/-友希那-Kernel-r14-LA.UM.8.6.r1-02600-89xx.0/-戸山-Kernel-r14-LA.UM.8.6.r1-02600-89xx.0/g'  ${KERNEL}/arch/arm64/configs/mido_defconfig
+					sed -i -e 's/-友希那-Kernel-r15-LA.UM.8.6.r1-02900-89xx.0/-戸山-Kernel-r15-LA.UM.8.6.r1-02900-89xx.0/g'  ${KERNEL}/arch/arm64/configs/mido_defconfig
 			fi
 			START=$(date +"%s")
 			make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
