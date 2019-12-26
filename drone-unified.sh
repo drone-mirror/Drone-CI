@@ -20,10 +20,10 @@
 # Let's make some option here
 #
 # Kernel Name Release
-# 0 = CAF || 1 = Clarity || 2 = Clarity-10 || 3 = Clarity-Lave || 4 = Clarity-UC-Mido
+# 0 = CAF || 1 = Clarity || 2 = Clarity-10 || 3 = Clarity-Lave
 #
 # Kernel Type
-# 0 = HMP || 1 = EAS
+# 0 = HMP || 1 = EAS || 2 = EAS-UC
 #
 # Kernel Branch Relase
 # 0 = BETA || 1 = Stable
@@ -40,12 +40,12 @@
 # Kernel Compiler
 # 0 = Clang 10.0.0 || 1 = Clang 10.0.1 + (GCC 9.2.0 32/64)
 #
-KERNEL_NAME_RELEASE="4"
+KERNEL_NAME_RELEASE="3"
 KERNEL_TYPE="1"
 KERNEL_BRANCH_RELEASE="0"
-KERNEL_ANDROID_VERSION="0"
-KERNEL_CODENAME="0"
-KERNEL_EXTEND="0"
+KERNEL_ANDROID_VERSION="2"
+KERNEL_CODENAME="1"
+KERNEL_EXTEND="1"
 KERNEL_COMPILER="0"
 
 # Compiling For Mido // If mido was selected
@@ -65,12 +65,23 @@ if [ "$KERNEL_CODENAME" == "0" ];
 
 		elif [ "$KERNEL_NAME_RELEASE" == "1" ];
 			then
-				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b dev/kasumi https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
-				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
+				if [ "$KERNEL_TYPE" == "1" ];
+					then
+						# Clone kernel & other repositories earlier
+						git clone --depth=1 -b dev/kasumi https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+						git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
 
-				# Define Kernel Scheduler
-				KERNEL_SCHED="EAS"
+						# Define Kernel Scheduler
+                                                KERNEL_SCHED="EAS"
+				elif [ "$KERNEL_TYPE" == "2" ];
+					then
+						# Clone kernel & other repositories earlier
+						git clone --depth=1 -b dev/kasumi-uc https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
+						git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
+
+						# Define Kernel Scheduler
+						KERNEL_SCHED="EAS-UC"
+				fi
 		elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 			then
 				# Clone kernel & other repositories earlier
@@ -79,26 +90,18 @@ if [ "$KERNEL_CODENAME" == "0" ];
 
 				# Define Kernel Scheduler
 				KERNEL_SCHED="EAS"
-		elif [ "$KERNEL_NAME_RELEASE" == "4" ];
-			then
-				# Clone kernel & other repositories earlier
-                                git clone --depth=1 -b dev/kasumi-uc https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
-                                git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
-
-				# Define Kernel Scheduler
-				KERNEL_SCHED="EAS-UC"
 		fi
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
+		# Create Temporary Folder
+		mkdir TEMP
+
 		# Cloning Kernel Repository
-		git clone --depth=1 -b toyama  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
+		git clone --depth=1 -b dev/kasumi-eas  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
 
 		# Cloning AnyKernel Repository
 		git clone https://github.com/Nicklas373/AnyKernel3 -b lavender
-
-		# Create Temporary Folder
-		mkdir TEMP
 fi
 if [ "$KERNEL_COMPILER" == "0" ];
 	then
@@ -167,7 +170,7 @@ elif [ "$KERNEL_NAME_RELEASE" == "2" ];
 elif [ "$KERNEL_NAME_RELEASE" == "3" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r11"
+		KERNEL_REV="r12"
 		KERNEL_NAME="Clarity"
 		KERNEL_TYPE="EAS"
 fi
@@ -345,12 +348,12 @@ function compile() {
 			bot_first_compile
 			if [ "$KERNEL_EXTEND" == "1" ];
 				then
-					sed -i -e 's/-友希那-Kernel-r10-LA.UM.8.2.r1-04800-sdm660.0/-戸山-Kernel-r11-LA.UM.8.2.r1-04800-sdm660.0/g'  ${KERNEL}/arch/arm64/configs/lavender_defconfig
+					sed -i -e 's/-友希那-Kernel-r12-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r12-LA.UM.8.2.r1-05100-sdm660.0/g'  ${KERNEL}/arch/arm64/configs/lavender_defconfig
 			fi
         		START=$(date +"%s")
-        		make -s lavender_defconfig O=out
+        		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
         		PATH="$(pwd)/clang/bin:${PATH}" \
-        		make -s -j$(nproc --all) O=out \
+        		make -s -c ${KERNEL} -j$(nproc --all) O=out \
                         				CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
 		        				CROSS_COMPILE=aarch64-linux-gnu- \
