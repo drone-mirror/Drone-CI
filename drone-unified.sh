@@ -345,11 +345,13 @@ function compile() {
 			kernel_upload
 	elif [ "$KERNEL_CODENAME" == "1" ];
 		then
+			cd ${KERNEL}
 			bot_first_compile
 			if [ "$KERNEL_EXTEND" == "1" ];
 				then
 					sed -i -e 's/-友希那-Kernel-r12-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r12-LA.UM.8.2.r1-05100-sdm660.0/g'  ${KERNEL}/arch/arm64/configs/lavender_defconfig
 			fi
+			cd ..
         		START=$(date +"%s")
         		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
         		PATH="$(pwd)/clang/bin:${PATH}" \
