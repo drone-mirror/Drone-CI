@@ -88,6 +88,7 @@ if [ "$KERNEL_CODENAME" == "0" ];
 				else
 						git clone --depth=1 -b mido-10 https://github.com/Nicklas373/AnyKernel3
 				fi
+		fi
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
@@ -140,18 +141,17 @@ export KBUILD_BUILD_HOST=Drone-CI
 # Kernel aliases
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
-		IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz-dtb"
-		KERNEL="$(pwd)/kernel"
-		KERNEL_TEMP="$(pwd)/TEMP"
+		IMAGE="${pwd}/kernel/out/arch/arm64/boot/Image.gz-dtb"
+		KERNEL="${pwd}/kernel"
+		KERNEL_TEMP="${pwd}/TEMP"
 		CODENAME="mido"
 		KERNEL_CODE="Mido"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		IMAGE="$(pwd)/out/arch/arm64/boot/Image.gz"
-		DTB="$(pwd)/out/arch/arm64/boot/dts/qcom"
-		KERNEL="$(pwd)"
-		KERNEL_TEMP="$(pwd)/TEMP"
+		IMAGE="${pwd}/out/arch/arm64/boot/Image.gz"
+		DTB="${pwd}out/arch/arm64/boot/dts/qcom"
+		KERNEL_TEMP="${pwd}/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
@@ -373,7 +373,7 @@ function compile() {
 	if [ "$KERNEL_COMPILER" == "2" ];
 		then
 			PATH="$(pwd)/clang/bin/:${PATH}" \
-			make -C -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+			make -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=${CLANG_TRIPLE} \
 							CROSS_COMPILE=${CROSS_COMPILE} \
@@ -415,14 +415,10 @@ function anykernel() {
 
 # Upload Kernel
 function kernel_upload(){
-	cd ${KERNEL}
+	cd ${pwd}
 	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git.log
 	cp git.log ${KERNEL_TEMP}
 	bot_complete_compile
-	if [ "$KERNEL_CODENAME" == "0" ];
-		then
-			cd ${KERNEL_TEMP}
-	fi
 	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_SCHED}-${KERNEL_TAG}-${KERNEL_DATE}.zip"  https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument
 	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/git.log" https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument
 	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/compile.log"  https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument}
