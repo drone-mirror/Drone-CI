@@ -142,7 +142,7 @@ export KBUILD_BUILD_HOST=Drone-CI
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
 		IMAGE="${pwd}/kernel/out/arch/arm64/boot/Image.gz-dtb"
-		KERNEL="${pwd}/kernel"
+		KERNEL="kernel"
 		KERNEL_TEMP="${pwd}/TEMP"
 		CODENAME="mido"
 		KERNEL_CODE="Mido"
@@ -151,7 +151,7 @@ elif [ "$KERNEL_CODENAME" == "1" ];
 	then
 		IMAGE="${pwd}/kernel/out/arch/arm64/boot/Image.gz"
 		DTB="${pwd}/kernel/out/arch/arm64/boot/dts/qcom"
-		KERNEL="${pwd}/kernel"
+		KERNEL="kernel"
 		KERNEL_TEMP="${pwd}/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
