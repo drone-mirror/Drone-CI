@@ -98,6 +98,9 @@ elif [ "$KERNEL_CODENAME" == "1" ];
 		# Cloning AnyKernel Repository
 		git clone --depth=1 -b lavender https://github.com/Nicklas373/AnyKernel3
 
+                # Define Kernel Scheduler
+                KERNEL_SCHED="EAS"
+
 		# Create Temporary Folder
 		mkdir TEMP
 fi
@@ -141,20 +144,20 @@ export KBUILD_BUILD_HOST=Drone-CI
 # Kernel aliases
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
-		IMAGE="${pwd}/kernel/out/arch/arm64/boot/Image.gz-dtb"
+		IMAGE="/kernel/out/arch/arm64/boot/Image.gz-dtb"
 		KERNEL="kernel"
-		KERNEL_TEMP="${pwd}/TEMP"
-                CONFIG="${pwd}/kernel"
+		KERNEL_TEMP="/TEMP"
+                CONFIG="/kernel"
 		CODENAME="mido"
 		KERNEL_CODE="Mido"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		IMAGE="${pwd}/kernel/out/arch/arm64/boot/Image.gz"
-		DTB="${pwd}/kernel/out/arch/arm64/boot/dts/qcom"
+		IMAGE="/kernel/out/arch/arm64/boot/Image.gz"
+		DTB="/kernel/out/arch/arm64/boot/dts/qcom"
 		KERNEL="kernel"
 		KERNEL_TEMP="${pwd}/TEMP"
-                CONFIG="${pwd}/kernel"
+                CONFIG="/kernel"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
