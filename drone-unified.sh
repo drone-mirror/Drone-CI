@@ -93,7 +93,7 @@ if [ "$KERNEL_CODENAME" == "0" ];
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
 		# Cloning Kernel Repository
-		git clone --depth=1 -b dev/kasumi-eas https://github.com/Nicklas373/kernel_xiaomi_lavender .
+		git clone --depth=1 -b dev/kasumi-eas https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
 
 		# Cloning AnyKernel Repository
 		git clone --depth=1 -b lavender https://github.com/Nicklas373/AnyKernel3
@@ -150,7 +150,8 @@ if [ "$KERNEL_CODENAME" == "0" ];
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
 		IMAGE="${pwd}/out/arch/arm64/boot/Image.gz"
-		DTB="${pwd}out/arch/arm64/boot/dts/qcom"
+		DTB="${pwd}/out/arch/arm64/boot/dts/qcom"
+		KERNEL="${pwd}/kernel"
 		KERNEL_TEMP="${pwd}/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
@@ -303,7 +304,6 @@ function compile() {
 		then
 			cd ${KERNEL}
 			bot_first_compile
-			cd ..
 			if [ "$KERNEL_EXTEND" == "0" ];
 				then
 					if [ "$KERNEL_TYPE" == "1" ] ;
@@ -363,24 +363,25 @@ function compile() {
 			kernel_upload
 	elif [ "$KERNEL_CODENAME" == "1" ];
 		then
+			cd ${KERNEL}
 			bot_first_compile
 			if [ "$KERNEL_EXTEND" == "1" ];
 				then
 					sed -i -e 's/-友希那-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/g' ${KERNEL}/arch/arm64/configs/lavender_defconfig
 			fi
         		START=$(date +"%s")
-        		make -s ${CODENAME}_defconfig O=out
+        		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
 	if [ "$KERNEL_COMPILER" == "2" ];
 		then
 			PATH="$(pwd)/clang/bin/:${PATH}" \
-			make -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=${CLANG_TRIPLE} \
 							CROSS_COMPILE=${CROSS_COMPILE} \
 							CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32}
 	else
 			PATH="$(pwd)/clang/bin:${PATH}" \
-			make -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
 							CROSS_COMPILE=aarch64-linux-gnu- \
@@ -415,7 +416,7 @@ function anykernel() {
 
 # Upload Kernel
 function kernel_upload(){
-	cd ${pwd}
+	cd ${KERNEL}
 	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git.log
 	cp git.log ${KERNEL_TEMP}
 	bot_complete_compile
