@@ -378,14 +378,14 @@ function compile() {
 	if [ "$KERNEL_COMPILER" == "2" ];
 		then
 			PATH="~/clang/bin/:${PATH}" \
-			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+			make -s -C ${KERNEL} -j$(nproc --all) O=out \
 							CC=clang \
 							CLANG_TRIPLE=${CLANG_TRIPLE} \
 							CROSS_COMPILE=${CROSS_COMPILE} \
 							CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32}
 	else
 			PATH="~/clang/bin:${PATH}" \
-			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+			make -s -C ${KERNEL} -j$(nproc --all) O=out \
 							CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
 							CROSS_COMPILE=aarch64-linux-gnu- \
