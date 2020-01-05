@@ -123,21 +123,21 @@ fi
 export ARCH=arm64
 if [ "$KERNEL_COMPILER" == "0" ];
 	then
-		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
+		export LD_LIBRARY_PATH="clang/bin/../lib:$PATH"
 elif [ "$KERNEL_COMPILER" == "1" ];
 	then
 		export CLANG_PATH=$(pwd)/clang/bin
 		export PATH=${CLANG_PATH}:${PATH}
-		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
+		export LD_LIBRARY_PATH="clang/bin/../lib:$PATH"
 elif [ "$KERNEL_COMPILER" == "2" ];
 	then
-		export CLANG_PATH=$(pwd)/clang/bin
+		export CLANG_PATH=clang/bin
                 export PATH=${CLANG_PATH}:${PATH}
-		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
+		export LD_LIBRARY_PATH="clang/bin/../lib:$PATH"
                 export CLANG_TRIPLE=aarch64-linux-gnu-
                 export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
-                export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
-		export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
+                export CROSS_COMPILE=gcc/bin/aarch64-linux-gnu-
+		export CROSS_COMPILE_ARM32=gcc_arm32/bin/arm-linux-gnueabi-
 fi
 export KBUILD_BUILD_USER=Kasumi
 export KBUILD_BUILD_HOST=Drone-CI
@@ -156,8 +156,7 @@ elif [ "$KERNEL_CODENAME" == "1" ];
 		IMAGE="/kernel/out/arch/arm64/boot/Image.gz"
 		DTB="/kernel/out/arch/arm64/boot/dts/qcom"
 		KERNEL="kernel"
-		KERNEL_TEMP="${pwd}/TEMP"
-                CONFIG="/kernel"
+		KERNEL_TEMP="/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
@@ -309,6 +308,7 @@ function compile() {
 		then
 			cd ${KERNEL}
 			bot_first_compile
+                        cd ..
 			if [ "$KERNEL_EXTEND" == "0" ];
 				then
 					if [ "$KERNEL_TYPE" == "1" ] ;
@@ -323,7 +323,7 @@ function compile() {
 			make -s -C ${CONFIG} ${CODENAME}_defconfig O=out
 		if [ "$KERNEL_COMPILER" == "0" ];
 			then
-				PATH="$(pwd)/clang/bin/:${PATH}" \
+				PATH="/clang/bin/:${PATH}" \
         			make -s -C ${KERNEL} -j$(nproc --all) O=out \
 								CC=clang \
 								CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -331,7 +331,7 @@ function compile() {
 								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 		elif [ "$KERNEL_COMPILER" == "1" ];
 			then
-				PATH="$(pwd)/clang/bin/:${PATH}" \
+				PATH="clang/bin/:${PATH}" \
 				make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 								CC=clang \
                                                                 CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -339,7 +339,7 @@ function compile() {
 								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 		elif [ "$KERNEL_COMPILER" == "2" ];
 			then
-				PATH="$(pwd)/clang/bin/:${PATH}" \
+				PATH="clang/bin/:${PATH}" \
 				make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 								CC=clang \
 								CLANG_TRIPLE=${CLANG_TRIPLE} \
@@ -370,22 +370,23 @@ function compile() {
 		then
 			cd ${KERNEL}
 			bot_first_compile
+                        cd ..
 			if [ "$KERNEL_EXTEND" == "1" ];
 				then
 					sed -i -e 's/-友希那-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/g' ${KERNEL}/arch/arm64/configs/lavender_defconfig
 			fi
         		START=$(date +"%s")
-        		make -s -C ${CONFIG} ${CODENAME}_defconfig O=out
+        		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
 	if [ "$KERNEL_COMPILER" == "2" ];
 		then
-			PATH="$(pwd)/clang/bin/:${PATH}" \
+			PATH="clang/bin/:${PATH}" \
 			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=${CLANG_TRIPLE} \
 							CROSS_COMPILE=${CROSS_COMPILE} \
 							CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32}
 	else
-			PATH="$(pwd)/clang/bin:${PATH}" \
+			PATH="clang/bin:${PATH}" \
 			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
