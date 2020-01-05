@@ -93,7 +93,7 @@ if [ "$KERNEL_CODENAME" == "0" ];
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
 		# Cloning Kernel Repository
-		git clone --depth=1 -b dev/kasumi-eas https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
+		git clone --depth=1 -b dev/eas-upstream https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
 
 		# Cloning AnyKernel Repository
 		git clone --depth=1 -b lavender https://github.com/Nicklas373/AnyKernel3
@@ -149,8 +149,8 @@ if [ "$KERNEL_CODENAME" == "0" ];
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		IMAGE="${pwd}/out/arch/arm64/boot/Image.gz"
-		DTB="${pwd}/out/arch/arm64/boot/dts/qcom"
+		IMAGE="${pwd}/kernel/out/arch/arm64/boot/Image.gz"
+		DTB="${pwd}/kernel/out/arch/arm64/boot/dts/qcom"
 		KERNEL="${pwd}/kernel"
 		KERNEL_TEMP="${pwd}/TEMP"
 		CODENAME="lavender"
