@@ -1,9 +1,16 @@
 kind: pipeline
-name: HANA-CI-Bot
+name: HANA-CI-Build-Project
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+depth: 1
 
 steps:
 - name: HANA-CI-Builder
-  image: ubuntu:rolling
+  image: najahi/oven:latest
   environment:
    tg_channel_id:
      from_secret: tg_channel_id
@@ -14,8 +21,6 @@ steps:
    token:
      from_secret: git_token
   commands:
-  - apt-get update -y &&  apt-get upgrade -y
-  - apt-get install -y bison flex bash wget ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev
-  - wget https://raw.githubusercontent.com/drone-mirror/Drone-CI/drone/drone-unified.sh
-  - chmod a+x drone-unified.sh
-  - bash drone-unified.sh
+  - wget https://raw.githubusercontent.com/Nicklas373/Semaphore-CI/semaphore-setup/circle-unified.sh
+  - chmod a+x circle-unified.sh
+  - bash circle-unified.sh
