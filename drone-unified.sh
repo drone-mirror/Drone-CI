@@ -320,7 +320,7 @@ function compile() {
 					fi
 			fi
 			START=$(date +"%s")
-			make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
+			make -s -C ${CONFIG} ${CODENAME}_defconfig O=out
 		if [ "$KERNEL_COMPILER" == "0" ];
 			then
 				PATH="$(pwd)/clang/bin/:${PATH}" \
@@ -375,7 +375,7 @@ function compile() {
 					sed -i -e 's/-友希那-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/g' ${KERNEL}/arch/arm64/configs/lavender_defconfig
 			fi
         		START=$(date +"%s")
-        		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
+        		make -s -C ${CONFIG} ${CODENAME}_defconfig O=out
 	if [ "$KERNEL_COMPILER" == "2" ];
 		then
 			PATH="$(pwd)/clang/bin/:${PATH}" \
