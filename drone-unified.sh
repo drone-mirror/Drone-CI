@@ -3,7 +3,7 @@
 # Copyright 2019, Najahiiii <najahiii@outlook.co.id>
 # Copyright 2019, alanndz <alanmahmud0@gmail.com>
 # Copyright 2019, Dicky Herlambang "Nicklas373" <herlambangdicky5@gmail.com>
-# Copyright 2016-2019, HANA-CI Build Project
+# Copyright 2016-2020, HANA-CI Build Project
 #
 # Clarity Kernel Builder Script || For Circle CI
 #
@@ -123,40 +123,42 @@ fi
 export ARCH=arm64
 if [ "$KERNEL_COMPILER" == "0" ];
 	then
-		export LD_LIBRARY_PATH="clang/bin/../lib:$PATH"
+                export CLANG_PATH=~/clang/bin
+		export PATH=${CLANG_PATH}:${PATH}
+		export LD_LIBRARY_PATH="~/clang/bin/../lib:$PATH"
 elif [ "$KERNEL_COMPILER" == "1" ];
 	then
-		export CLANG_PATH=$(pwd)/clang/bin
+		export CLANG_PATH=~/clang/bin
 		export PATH=${CLANG_PATH}:${PATH}
-		export LD_LIBRARY_PATH="clang/bin/../lib:$PATH"
+		export LD_LIBRARY_PATH="~/clang/bin/../lib:$PATH"
 elif [ "$KERNEL_COMPILER" == "2" ];
 	then
-		export CLANG_PATH=clang/bin
+		export CLANG_PATH=~/clang/bin
                 export PATH=${CLANG_PATH}:${PATH}
-		export LD_LIBRARY_PATH="clang/bin/../lib:$PATH"
+		export LD_LIBRARY_PATH="~/clang/bin/../lib:$PATH"
                 export CLANG_TRIPLE=aarch64-linux-gnu-
                 export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
-                export CROSS_COMPILE=gcc/bin/aarch64-linux-gnu-
-		export CROSS_COMPILE_ARM32=gcc_arm32/bin/arm-linux-gnueabi-
+                export CROSS_COMPILE=~/gcc/bin/aarch64-linux-gnu-
+		export CROSS_COMPILE_ARM32=~/gcc_arm32/bin/arm-linux-gnueabi-
 fi
 export KBUILD_BUILD_USER=Kasumi
 export KBUILD_BUILD_HOST=Drone-CI
 # Kernel aliases
 if [ "$KERNEL_CODENAME" == "0" ];
 	then
-		IMAGE="/kernel/out/arch/arm64/boot/Image.gz-dtb"
+		IMAGE="~/kernel/out/arch/arm64/boot/Image.gz-dtb"
 		KERNEL="kernel"
 		KERNEL_TEMP="/TEMP"
-                CONFIG="/kernel"
+                CONFIG="~/kernel"
 		CODENAME="mido"
 		KERNEL_CODE="Mido"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		IMAGE="/kernel/out/arch/arm64/boot/Image.gz"
-		DTB="/kernel/out/arch/arm64/boot/dts/qcom"
+		IMAGE="~/kernel/out/arch/arm64/boot/Image.gz"
+		DTB="~/kernel/out/arch/arm64/boot/dts/qcom"
 		KERNEL="kernel"
-		KERNEL_TEMP="/TEMP"
+		KERNEL_TEMP="~/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
@@ -323,7 +325,7 @@ function compile() {
 			make -s -C ${CONFIG} ${CODENAME}_defconfig O=out
 		if [ "$KERNEL_COMPILER" == "0" ];
 			then
-				PATH="/clang/bin/:${PATH}" \
+				PATH="~/clang/bin/:${PATH}" \
         			make -s -C ${KERNEL} -j$(nproc --all) O=out \
 								CC=clang \
 								CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -331,7 +333,7 @@ function compile() {
 								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 		elif [ "$KERNEL_COMPILER" == "1" ];
 			then
-				PATH="clang/bin/:${PATH}" \
+				PATH="~/clang/bin/:${PATH}" \
 				make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 								CC=clang \
                                                                 CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -339,7 +341,7 @@ function compile() {
 								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 		elif [ "$KERNEL_COMPILER" == "2" ];
 			then
-				PATH="clang/bin/:${PATH}" \
+				PATH="~/clang/bin/:${PATH}" \
 				make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 								CC=clang \
 								CLANG_TRIPLE=${CLANG_TRIPLE} \
@@ -351,17 +353,13 @@ function compile() {
                 			echo "kernel not found"
                 			END=$(date +"%s")
                 			DIFF=$(($END - $START))
-					cd ${KERNEL}
                 			bot_build_failed
-					cd ..
 					sendStick "${TELEGRAM_FAIL}"
                 			exit 1
         		fi
         		END=$(date +"%s")
         		DIFF=$(($END - $START))
-			cd ${KERNEL}
 			bot_build_success
-			cd ..
 			sendStick "${TELEGRAM_SUCCESS}"
         		cp ${IMAGE} AnyKernel3
 			anykernel
@@ -379,14 +377,14 @@ function compile() {
         		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
 	if [ "$KERNEL_COMPILER" == "2" ];
 		then
-			PATH="clang/bin/:${PATH}" \
+			PATH="~/clang/bin/:${PATH}" \
 			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=${CLANG_TRIPLE} \
 							CROSS_COMPILE=${CROSS_COMPILE} \
 							CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32}
 	else
-			PATH="clang/bin:${PATH}" \
+			PATH="~/clang/bin:${PATH}" \
 			make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
 							CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
