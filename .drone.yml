@@ -5,10 +5,14 @@ steps:
 - name: HANA-CI-Builder
   image: ubuntu:rolling
   environment:
+   tg_channel_id:
+     from_secret: tg_channel_id
+   tg_group_id:
+     from_secret: tg_group_id
+   tg_bot_id:
+     from_secret: tg_bot_id
    token:
-     from_secret: token
-   chat_id:
-     from_secret: chat_id
+     from_secret: git_token
   commands:
   - apt-get update -y &&  apt-get upgrade -y
   - apt-get install -y bison flex bash wget ccache bc git-core gnupg build-essential zip curl make automake autogen autoconf autotools-dev libtool shtool python m4 gcc libtool zlib1g-dev dash libssl-dev

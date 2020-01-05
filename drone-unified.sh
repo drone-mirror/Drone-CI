@@ -20,7 +20,7 @@
 # Let's make some option here
 #
 # Kernel Name Release
-# 0 = CAF || 1 = Clarity || 2 = Clarity-10 || 3 = Clarity-Lave
+# 0 = CAF || 1 = Clarity
 #
 # Kernel Type
 # 0 = HMP || 1 = EAS || 2 = EAS-UC
@@ -38,9 +38,9 @@
 # 0 = Dev-Mido || 1 = Dev-Lave || 2 = Null
 #
 # Kernel Compiler
-# 0 = Clang 10.0.0 || 1 = Clang 10.0.1 + (GCC 9.2.0 32/64)
+# 0 = Clang 10.0.0 (Nusantara Clang) || 1 = Clang 10.0.0 (Pendulum Clang) || 2 = Clang 10.0.3 + (GCC 10.0-0155-221219 Non-elf 32/64)
 #
-KERNEL_NAME_RELEASE="3"
+KERNEL_NAME_RELEASE="1"
 KERNEL_TYPE="1"
 KERNEL_BRANCH_RELEASE="0"
 KERNEL_ANDROID_VERSION="2"
@@ -58,7 +58,7 @@ if [ "$KERNEL_CODENAME" == "0" ];
 			then
 				# Clone kernel & other repositories earlier
 				git clone --depth=1 -b pie https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
-				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b caf/mido
+				git clone --depth=1 -b mido-10 https://github.com/Nicklas373/AnyKernel3
 
 				# Define Kernel Scheduler
 				KERNEL_SCHED="HMP"
@@ -69,7 +69,6 @@ if [ "$KERNEL_CODENAME" == "0" ];
 					then
 						# Clone kernel & other repositories earlier
 						git clone --depth=1 -b dev/kasumi https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
-						git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
 
 						# Define Kernel Scheduler
                                                 KERNEL_SCHED="EAS"
@@ -77,31 +76,29 @@ if [ "$KERNEL_CODENAME" == "0" ];
 					then
 						# Clone kernel & other repositories earlier
 						git clone --depth=1 -b dev/kasumi-uc https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
-						git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b mido
 
 						# Define Kernel Scheduler
 						KERNEL_SCHED="EAS-UC"
 				fi
-		elif [ "$KERNEL_NAME_RELEASE" == "2" ];
-			then
-				# Clone kernel & other repositories earlier
-				git clone --depth=1 -b dev/kasumi-10 https://github.com/Nicklas373/kernel_xiaomi_msm8953-3.18-2 kernel
-				git clone https://github.com/Nicklas373/AnyKernel3 --depth=1 -b yukina/10
 
-				# Define Kernel Scheduler
-				KERNEL_SCHED="EAS"
-		fi
+				# Detect Android Version earlier and clone AnyKernel depend on android version
+				if [ "$KERNEL_ANDROID_VERSION" == "0" ];
+					then
+						git clone --depth=1 -b mido https://github.com/Nicklas373/AnyKernel3
+				else
+						git clone --depth=1 -b mido-10 https://github.com/Nicklas373/AnyKernel3
+				fi
 # Compiling Repository For Lavender // If lavender was selected
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		# Create Temporary Folder
-		mkdir TEMP
-
 		# Cloning Kernel Repository
-		git clone --depth=1 -b dev/kasumi-eas  https://github.com/Nicklas373/kernel_xiaomi_lavender kernel
+		git clone --depth=1 -b dev/kasumi-eas https://github.com/Nicklas373/kernel_xiaomi_lavender .
 
 		# Cloning AnyKernel Repository
-		git clone https://github.com/Nicklas373/AnyKernel3 -b lavender
+		git clone --depth=1 -b lavender https://github.com/Nicklas373/AnyKernel3
+
+		# Create Temporary Folder
+		mkdir TEMP
 fi
 if [ "$KERNEL_COMPILER" == "0" ];
 	then
@@ -110,9 +107,13 @@ if [ "$KERNEL_COMPILER" == "0" ];
 elif [ "$KERNEL_COMPILER" == "1" ];
 	then
 		# Cloning Toolchains Repository
-		git clone https://github.com/Nicklas373/aosp-clang -b r370808 clang
-		git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm gcc_arm32
-		git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-9.2.0/arm64 gcc
+		git clone --depth=1 https://github.com/Haseo97/Clang-10.0.0 -b clang-10.0.0 clang
+elif [ "$KERNEL_COMPILER" == "2" ];
+	then
+		# Cloning Toolchains Repository
+		git clone https://github.com/NusantaraDevs/clang -b ndk-clang-10 clang
+		git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-10.0.0/arm gcc_arm32
+		git clone https://github.com/najahiiii/priv-toolchains -b non-elf/gcc-10.0.0/arm64 gcc
 fi
 # Kernel Enviroment
 export ARCH=arm64
@@ -123,9 +124,15 @@ elif [ "$KERNEL_COMPILER" == "1" ];
 	then
 		export CLANG_PATH=$(pwd)/clang/bin
 		export PATH=${CLANG_PATH}:${PATH}
-		export CLANG_TRIPLE=aarch64-linux-gnu-
-		export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
-		export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
+		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
+elif [ "$KERNEL_COMPILER" == "2" ];
+	then
+		export CLANG_PATH=$(pwd)/clang/bin
+                export PATH=${CLANG_PATH}:${PATH}
+		export LD_LIBRARY_PATH="$(pwd)/clang/bin/../lib:$PATH"
+                export CLANG_TRIPLE=aarch64-linux-gnu-
+                export CLANG_TRIPLE_ARM32=arm-linux-gnueabi-
+                export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
 		export CROSS_COMPILE_ARM32=$(pwd)/gcc_arm32/bin/arm-linux-gnueabi-
 fi
 export KBUILD_BUILD_USER=Kasumi
@@ -141,38 +148,40 @@ if [ "$KERNEL_CODENAME" == "0" ];
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 4x"
 elif [ "$KERNEL_CODENAME" == "1" ];
 	then
-		IMAGE="$(pwd)/kernel/out/arch/arm64/boot/Image.gz"
-		DTB="$(pwd)/kernel/out/arch/arm64/boot/dts/qcom"
-		KERNEL="$(pwd)/kernel"
+		IMAGE="$(pwd)/out/arch/arm64/boot/Image.gz"
+		DTB="$(pwd)/out/arch/arm64/boot/dts/qcom"
+		KERNEL="$(pwd)"
 		KERNEL_TEMP="$(pwd)/TEMP"
 		CODENAME="lavender"
 		KERNEL_CODE="Lavender"
 		TELEGRAM_DEVICE="Xiaomi Redmi Note 7"
 fi
-if [ "$KERNEL_NAME_RELEASE" == "0" ];
+if [ "$KERNEL_TYPE" == "0" ];
 	then
 		# Kernel extend aliases
-		KERNEL_REV="r9"
+		KERNEL_REV="r10"
 		KERNEL_NAME="CAF"
-		KERNEL_TYPE="HMP"
-elif [ "$KERNEL_NAME_RELEASE" == "1" ];
+		COMMIT="1db74c045cad77d37578b457e11f7637e749fb84"
+elif [ "$KERNEL_TYPE" == "1" ];
+	then
+		if [ "$KERNEL_CODENAME" == "0" ];
+			then
+				# Kernel extend aliases
+				KERNEL_REV="r16"
+				KERNEL_NAME="Clarity"
+				COMMIT="e70d423a7638e5cd991782f61c7631835d5ce1f2"
+		elif [ "$KERNEL_CODENAME" == "1" ];
+			then
+				 # Kernel extend aliases
+				KERNEL_REV="r13"
+				KERNEL_NAME="Clarity"
+		fi
+elif [ "$KERNEL_TYPE" == "2" ];
 	then
 		# Kernel extend aliases
 		KERNEL_REV="r15"
 		KERNEL_NAME="Clarity"
-		KERNEL_TYPE="EAS"
-elif [ "$KERNEL_NAME_RELEASE" == "2" ];
-	then
-		# Kernel extend aliases
-		KERNEL_REV="r15"
-		KERNEL_NAME="Clarity"
- 		KERNEL_TYPE="EAS"
-elif [ "$KERNEL_NAME_RELEASE" == "3" ];
-	then
-		# Kernel extend aliases
-		KERNEL_REV="r12"
-		KERNEL_NAME="Clarity"
-		KERNEL_TYPE="EAS"
+		COMMIT="a1c8138bb049459b4ce33f5e9fbae1559af59e2d"
 fi
 KERNEL_SUFFIX="Kernel"
 KERNEL_DATE="$(date +%Y%m%d-%H%M)"
@@ -198,15 +207,16 @@ elif [ "$KERNEL_BRANCH_RELEASE" == "0" ];
 fi
 
 # Telegram aliases
-TELEGRAM_BOT_ID="882513869:AAGu8crueJQlsvLWH119zugCGpIxEYwEHj0"
+TELEGRAM_BOT_ID=${tg_bot_id}
 if [ "$KERNEL_BRANCH_RELEASE" == "1" ];
 	then
-		TELEGRAM_GROUP_ID="-1001336252759"
+		TELEGRAM_GROUP_ID=${tg_channel_id}
 elif [ "$KERNEL_BRANCH_RELEASE" == "0" ];
 	then
-		TELEGRAM_GROUP_ID="-1001251953845"
+		TELEGRAM_GROUP_ID=${tg_group_id}
 fi
-TELEGRAM_FILENAME="${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_TAG}-${KERNEL_DATE}.zip"
+
+TELEGRAM_FILENAME="${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_SCHED}-${KERNEL_TAG}-${KERNEL_DATE}.zip"
 export TELEGRAM_SUCCESS="CAADBQADhQcAAhIzkhBQ0UsCTcSAWxYE"
 export TELEGRAM_FAIL="CAADBQADfgcAAhIzkhBSDI8P9doS7BYE"
 
@@ -235,13 +245,9 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
 	      "<b>${KERNEL_NAME} Kernel build Start!</b>" \
 	      "" \
  	      "<b>Build Status :</b><code> ${KERNEL_RELEASE} </code>" \
-              "" \
               "<b>Device :</b><code> ${TELEGRAM_DEVICE} </code>" \
-              "" \
               "<b>Kernel Scheduler :</b><code> ${KERNEL_SCHED} </code>" \
-	      "" \
 	      "<b>Android Version :</b><code> ${KERNEL_ANDROID_VER} </code>" \
-	      "" \
               "<b>Latest commit :</b><code> $(git --no-pager log --pretty=format:'"%h - %s (%an)"' -1) </code>"
 }
 
@@ -253,28 +259,21 @@ bot_template  "<b>|| Drone-CI Build Bot ||</b>" \
     "<b>New ${KERNEL_NAME} Kernel Build Is Available!</b>" \
     "" \
     "<b>Build Status :</b><code> ${KERNEL_RELEASE} </code>" \
-    "" \
     "<b>Device :</b><code> ${TELEGRAM_DEVICE} </code>" \
-    "" \
-    "<b>Kernel Scheduler :</b><code> ${KERNEL_SCHED} </code>" \
-    "" \
     "<b>Android Version :</b><code> ${KERNEL_ANDROID_VER} </code>" \
     "" \
-    "<b>Filename :</b><code> ${TELEGRAM_FILENAME}</code>" \
-    "" \
+    "<b>Kernel Scheduler :</b><code> ${KERNEL_SCHED} </code>" \
     "<b>Kernel Version:</b><code> Linux ${TELEGRAM_KERNEL_VER}</code>" \
-    "" \
     "<b>Kernel Host:</b><code> ${TELEGRAM_COMPILER_NAME}@${TELEGRAM_COMPILER_HOST}</code>" \
-    "" \
     "<b>Kernel Toolchain :</b><code> ${TELEGRAM_TOOLCHAIN_VER}</code>" \
     "" \
+    "<b>Filename :</b><code> ${TELEGRAM_FILENAME}</code>" \
     "<b>UTS Version :</b><code> ${TELEGRAM_UTS_VER}</code>" \
-    "" \
     "<b>Latest commit :</b><code> $(git --no-pager log --pretty=format:'"%h - %s (%an)"' -1)</code>" \
     "" \
     "<b>Compile Time :</b><code> $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s)</code>" \
     "" \
-    "<b>                         HANA-CI Build Project | 2016-2019                            </b>"
+    "<b>                         HANA-CI Build Project | 2016-2020                            </b>"
 }
 
 # Telegram bot message || success notification
@@ -307,7 +306,13 @@ function compile() {
 			cd ..
 			if [ "$KERNEL_EXTEND" == "0" ];
 				then
-					sed -i -e 's/-友希那-Kernel-r15-LA.UM.8.6.r1-02900-89xx.0/-戸山-Kernel-r15-LA.UM.8.6.r1-02900-89xx.0/g'  ${KERNEL}/arch/arm64/configs/mido_defconfig
+					if [ "$KERNEL_TYPE" == "1" ] ;
+						then
+							sed -i -e 's/-友希那-Kernel-r16-LA.UM.8.6.r1-02900-89xx.0/-戸山-Kernel-r16-LA.UM.8.6.r1-02900-89xx.0/g'  ${KERNEL}/arch/arm64/configs/mido_defconfig
+					elif [ "$KERNEL_TYPE" == "2" ];
+						then
+							sed -i -e 's/-友希那-Kernel-r16-UC-LA.UM.8.6.r1-02900-89xx.0/-戸山-Kernel-r16-UC-LA.UM.8.6.r1-02900-89xx.0/g' ${KERNEL}/arch/arm64/configs/mido_defconfig
+					fi
 			fi
 			START=$(date +"%s")
 			make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
@@ -321,7 +326,20 @@ function compile() {
 								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 		elif [ "$KERNEL_COMPILER" == "1" ];
 			then
-				make -s -C ${KERNEL} CC=clang CLANG_TRIPLE=${CLANG_TRIPLE} CLANG_TRIPLE_ARM32=${CLANG_TRIPLE_ARM32} CROSS_COMPILE=${CROSS_COMPILE} CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32} -j$(nproc --all)
+				PATH="$(pwd)/clang/bin/:${PATH}" \
+				make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+								CC=clang \
+                                                                CLANG_TRIPLE=aarch64-linux-gnu- \
+								CROSS_COMPILE=aarch64-linux-gnu- \
+								CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+		elif [ "$KERNEL_COMPILER" == "2" ];
+			then
+				PATH="$(pwd)/clang/bin/:${PATH}" \
+				make -C ${KERNEL} -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+								CC=clang \
+								CLANG_TRIPLE=${CLANG_TRIPLE} \
+								CROSS_COMPILE=${CROSS_COMPILE} \
+								CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32}
 		fi
 			if ! [ -a $IMAGE ];
 				then
@@ -340,26 +358,34 @@ function compile() {
 			bot_build_success
 			cd ..
 			sendStick "${TELEGRAM_SUCCESS}"
-        		cp ${IMAGE} AnyKernel3/Image.gz-dtb
+        		cp ${IMAGE} AnyKernel3
 			anykernel
 			kernel_upload
 	elif [ "$KERNEL_CODENAME" == "1" ];
 		then
-			cd ${KERNEL}
 			bot_first_compile
 			if [ "$KERNEL_EXTEND" == "1" ];
 				then
-					sed -i -e 's/-友希那-Kernel-r12-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r12-LA.UM.8.2.r1-05100-sdm660.0/g'  ${KERNEL}/arch/arm64/configs/lavender_defconfig
+					sed -i -e 's/-友希那-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/-戸山-Kernel-r13-LA.UM.8.2.r1-05100-sdm660.0/g' ${KERNEL}/arch/arm64/configs/lavender_defconfig
 			fi
-			cd ..
         		START=$(date +"%s")
-        		make -s -C ${KERNEL} ${CODENAME}_defconfig O=out
-        		PATH="$(pwd)/clang/bin:${PATH}" \
-        		make -s -c ${KERNEL} -j$(nproc --all) O=out \
-                        				CC=clang \
+        		make -s ${CODENAME}_defconfig O=out
+	if [ "$KERNEL_COMPILER" == "2" ];
+		then
+			PATH="$(pwd)/clang/bin/:${PATH}" \
+			make -C -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+							CC=clang \
+							CLANG_TRIPLE=${CLANG_TRIPLE} \
+							CROSS_COMPILE=${CROSS_COMPILE} \
+							CROSS_COMPILE_ARM32=${CROSS_COMPILE_ARM32}
+	else
+			PATH="$(pwd)/clang/bin:${PATH}" \
+			make -j$(nproc --all) -> ${KERNEL_TEMP}/compile.log O=out \
+							CC=clang \
 							CLANG_TRIPLE=aarch64-linux-gnu- \
-		        				CROSS_COMPILE=aarch64-linux-gnu- \
+							CROSS_COMPILE=aarch64-linux-gnu- \
 							CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+	fi
 			if ! [ -a $IMAGE ];
 				then
                 			echo "kernel not found"
@@ -384,18 +410,22 @@ function compile() {
 function anykernel() {
 	cd AnyKernel3
 	make -j4
-        mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_TAG}-${KERNEL_DATE}.zip
+	mv Clarity-Kernel-${KERNEL_CODE}-signed.zip  ${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_SCHED}-${KERNEL_TAG}-${KERNEL_DATE}.zip
 }
 
 # Upload Kernel
 function kernel_upload(){
 	cd ${KERNEL}
+	git --no-pager log --pretty=format:"%h - %s (%an)" --abbrev-commit ${COMMIT}..HEAD > git.log
+	cp git.log ${KERNEL_TEMP}
 	bot_complete_compile
 	if [ "$KERNEL_CODENAME" == "0" ];
 		then
 			cd ${KERNEL_TEMP}
 	fi
-	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_TYPE}-${KERNEL_TAG}-${KERNEL_DATE}.zip"  https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument
+	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/${KERNEL_NAME}-${KERNEL_SUFFIX}-${KERNEL_CODE}-${KERNEL_REV}-${KERNEL_SCHED}-${KERNEL_TAG}-${KERNEL_DATE}.zip"  https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument
+	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/git.log" https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument
+	curl -F chat_id=${TELEGRAM_GROUP_ID} -F document="@${KERNEL_TEMP}/compile.log"  https://api.telegram.org/bot${TELEGRAM_BOT_ID}/sendDocument}
 }
 
 # Running
