@@ -22,5 +22,5 @@ steps:
      from_secret: git_token
   commands:
   - wget https://github.com/nicklas373/build_kernel/raw/test/.circleci/build.sh
-  - chmod a+x circle-unified.sh
-  - bash circle-unified.sh
+  - chmod a+x build.sh
+  - bash build.sh
