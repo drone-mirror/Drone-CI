@@ -21,6 +21,6 @@ steps:
    token:
      from_secret: git_token
   commands:
-  - wget https://raw.githubusercontent.com/Nicklas373/Semaphore-CI/semaphore-setup/circle-unified.sh
-  - chmod a+x circle-unified.sh
-  - bash circle-unified.sh
+  - wget https://raw.githubusercontent.com/Nicklas373/CI/CI/ci.sh
+  - chmod a+x ci.sh
+  - bash ci.sh
