@@ -10,7 +10,7 @@ depth: 1
 
 steps:
 - name: HANA-CI-Builder
-  image: najahi/oven:latest
+  image: alanndz/oven:latest
   environment:
    tg_channel_id:
      from_secret: tg_channel_id
