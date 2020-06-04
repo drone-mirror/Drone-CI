@@ -23,8 +23,6 @@ steps:
    tg_aln_id:
      from_secret: tg_aln_id
   commands:
-  - apt-get update -y &&  apt-get upgrade -y
-  - apt-get install -y -q --force-yes libncurses5 libncurses5-dev libncursesw5-dev
   - wget https://raw.githubusercontent.com/Nicklas373/CI/CI/ci
   - chmod a+x ci
   - bash ci
