@@ -22,6 +22,8 @@ steps:
      from_secret: git_token
    tg_aln_id:
      from_secret: tg_aln_id
+   telegram_fusion_id
+     from_secret: telegram_fusion_id
   commands:
   - wget https://raw.githubusercontent.com/Nicklas373/CI/CI/ci
   - chmod a+x ci
